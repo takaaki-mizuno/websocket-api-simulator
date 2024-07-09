@@ -1,0 +1,14 @@
+services:
+  websocket:
+    build: .
+    ports:
+      - "8180:8180"
+    volumes:
+      - .:/app
+      - /app/.venv
+    environment:
+      - CONNECT_ROUTE=
+      - DISCONNECT_ROUTE=
+      - DEFAULT_ROUTE=
+      - PORT=8180
+    restart: unless-stopped
