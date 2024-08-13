@@ -31,15 +31,27 @@ async def handle_websocket(request):
 
         message: WSMessage
         async for message in websocket:
+            # convert binary message.type to hex
+            _type = message.type.to_bytes(1, byteorder='big').hex()
+            logger.info(f"Message received ::: {_type}")
             if message.type == WSMsgType.TEXT:
                 await handle_route('$default', connection_id, message.data)
             elif message.type == WSMsgType.ERROR:
-                print(f'WebSocket connection closed with exception {websocket.exception()}')
+                logger.error(f"WebSocket connection closed with exception {websocket.exception()}")
+                break
+            elif message.type == WSMsgType.CLOSE:
+                logger.info(f"WebSocket closed by client: {connection_id}")
+                break
+
+    except Exception as e:
+        logger.error(f"Unexpected error in WebSocket handler: {str(e)}")
 
     finally:
+        logger.info(f"Connection closed: {connection_id}")
         del connections[connection_id]
         await handle_route('$disconnect', connection_id)
-        logger.info(f"Connection closed: {connection_id}")
+
+    logger.info("loop ended")
 
     return websocket
 
