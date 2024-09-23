@@ -63,20 +63,13 @@ async def handle_route(route, connection_id, body=''):
         return
 
     headers = {
-        'Content-Type': 'application/json'
-    }
-
-    event = {
-        'requestContext': {
-            'connectionId': connection_id,
-            'routeKey': route
-        },
-        'body': body
+        'Content-Type': 'application/json',
+        'connectionId': connection_id
     }
 
     try:
         async with ClientSession(timeout=ClientTimeout(total=5)) as session:
-            async with session.post(url, json=event, headers=headers) as response:
+            async with session.post(url, data=body, headers=headers) as response:
                 if response.status >= 400:
                     print(f"Error calling {route} handler: {response.status}")
                     return
